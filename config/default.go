@@ -7,9 +7,16 @@ import (
 )
 
 type Config struct {
-	PostgreDriver string `mapstructure:"POSTGRES_DRIVER"`
-	PostgreURI    string `mapstructure:"POSTGRES_URI"`
-	PORT          string `mapstructure:"PORT"`
+	PostgreDriver          string `mapstructure:"POSTGRES_DRIVER"`
+	PostgreURI             string `mapstructure:"POSTGRES_URI"`
+	PORT                   string `mapstructure:"PORT"`
+	Origin                 string `mapstructure:"ORIGIN"`
+	AccessTokenPublicKey   string `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
+	AccessTokenPrivateKey  string `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
+	RefreshTokenPrivateKey string `mapstructure:"REFRESH_TOKEN_PRIVATE_KEY"`
+	RefreshTokenPublicKey  string `mapstructure:"REFRESH_TOKEN_PUBLIC_KEY"`
+	AccessTokenMaxAge      int    `mapstructure:"ACCESS_TOKEN_MAX_AGE"`
+	RefreshTokenMaxAge     int    `mapstructure:"REFRESH_TOKEN_MAX_AGE"`
 }
 
 func LoadConfig() (c *Config, err error) {

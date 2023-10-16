@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mas-wig/simple-api/config"
 	"github.com/mas-wig/simple-api/controllers"
-	dbConn "github.com/mas-wig/simple-api/db/sqlc"
+
 	"github.com/mas-wig/simple-api/routes"
 
 	_ "github.com/lib/pq"
