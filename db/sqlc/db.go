@@ -24,11 +24,20 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createPostStmt, err = db.PrepareContext(ctx, createPost); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePost: %w", err)
+	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.deletePostStmt, err = db.PrepareContext(ctx, deletePost); err != nil {
+		return nil, fmt.Errorf("error preparing query DeletePost: %w", err)
+	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
+	}
+	if q.getPostByIdStmt, err = db.PrepareContext(ctx, getPostById); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPostById: %w", err)
 	}
 	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
@@ -36,8 +45,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByIdStmt, err = db.PrepareContext(ctx, getUserById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserById: %w", err)
 	}
+	if q.listPostsStmt, err = db.PrepareContext(ctx, listPosts); err != nil {
+		return nil, fmt.Errorf("error preparing query ListPosts: %w", err)
+	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
+	}
+	if q.updatePostStmt, err = db.PrepareContext(ctx, updatePost); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePost: %w", err)
 	}
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
@@ -47,14 +62,29 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createPostStmt != nil {
+		if cerr := q.createPostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPostStmt: %w", cerr)
+		}
+	}
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
+	if q.deletePostStmt != nil {
+		if cerr := q.deletePostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deletePostStmt: %w", cerr)
+		}
+	}
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
+		}
+	}
+	if q.getPostByIdStmt != nil {
+		if cerr := q.getPostByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPostByIdStmt: %w", cerr)
 		}
 	}
 	if q.getUserByEmailStmt != nil {
@@ -67,9 +97,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserByIdStmt: %w", cerr)
 		}
 	}
+	if q.listPostsStmt != nil {
+		if cerr := q.listPostsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listPostsStmt: %w", cerr)
+		}
+	}
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
+		}
+	}
+	if q.updatePostStmt != nil {
+		if cerr := q.updatePostStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePostStmt: %w", cerr)
 		}
 	}
 	if q.updateUserStmt != nil {
@@ -116,11 +156,16 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                 DBTX
 	tx                 *sql.Tx
+	createPostStmt     *sql.Stmt
 	createUserStmt     *sql.Stmt
+	deletePostStmt     *sql.Stmt
 	deleteUserStmt     *sql.Stmt
+	getPostByIdStmt    *sql.Stmt
 	getUserByEmailStmt *sql.Stmt
 	getUserByIdStmt    *sql.Stmt
+	listPostsStmt      *sql.Stmt
 	listUsersStmt      *sql.Stmt
+	updatePostStmt     *sql.Stmt
 	updateUserStmt     *sql.Stmt
 }
 
@@ -128,11 +173,16 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                 tx,
 		tx:                 tx,
+		createPostStmt:     q.createPostStmt,
 		createUserStmt:     q.createUserStmt,
+		deletePostStmt:     q.deletePostStmt,
 		deleteUserStmt:     q.deleteUserStmt,
+		getPostByIdStmt:    q.getPostByIdStmt,
 		getUserByEmailStmt: q.getUserByEmailStmt,
 		getUserByIdStmt:    q.getUserByIdStmt,
+		listPostsStmt:      q.listPostsStmt,
 		listUsersStmt:      q.listUsersStmt,
+		updatePostStmt:     q.updatePostStmt,
 		updateUserStmt:     q.updateUserStmt,
 	}
 }

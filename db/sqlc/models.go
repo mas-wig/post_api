@@ -10,6 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Post struct {
+	ID        uuid.UUID `json:"id"`
+	Title     string    `json:"title"`
+	Category  string    `json:"category"`
+	Content   string    `json:"content"`
+	Image     string    `json:"image"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type User struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`

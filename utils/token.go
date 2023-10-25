@@ -51,15 +51,12 @@ func ValidateToken(token string, publicKey string) (interface{}, error) {
 		}
 		return key, nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("validate => %w ", err)
 	}
-
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok || !parsedToken.Valid {
 		return nil, fmt.Errorf("validate => invalid token ")
 	}
-
 	return claims["sub"], nil
 }
